@@ -1,4 +1,4 @@
-0 Nothing
-1 Rock
-2 Paper
-3 Scissors
+0 rock
+1 paper
+2 scissors
+3 nothing

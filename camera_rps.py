@@ -15,15 +15,15 @@ class rps:
     #List of valid options for game
     choices = ['rock','paper','scissors']
 
-    computer_wins = 0
-    user_wins = 0
+    
 
     '''
     load model in constructor
     '''
     def __init__(self):
         self.model = load_model('keras_model.h5')
-
+        self.computer_wins = 0
+        self.user_wins = 0
 
 
     '''
@@ -33,44 +33,42 @@ class rps:
         return random.choice(self.choices)
 
 
-    def test(self):
+    def get_prediction(self):
         cap = cv2.VideoCapture(0)
         data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
 
-        while True: 
+        current = time.time()
+
+        while current+5 > time.time(): 
             ret, frame = cap.read()
             resized_frame = cv2.resize(frame, (224, 224), interpolation = cv2.INTER_AREA)
             image_np = np.array(resized_frame)
             normalized_image = (image_np.astype(np.float32) / 127.0) - 1 # Normalize the image
             data[0] = normalized_image
-            prediction = self.model.predict(data)
+            # prediction = self.model.predict(data)
+
+            # Display countdown on each frame
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            cv2.putText(frame, str(int(current-time.time()+5)),
+                        (200, 250), font,
+                        7, (0, 255, 255),
+                        4, cv2.LINE_AA)
+
             cv2.imshow('frame', frame)
-            # Press q to close the window
-            print(prediction)
+            # Without the following 2 lines frame doesn't seem to chow even though camera works
+            if cv2.waitKey(1) == ord('q'):
+                break
+
+        prediction = self.model.predict(data)   
+        print (prediction)         
+        # After the loop release the cap object
+        cap.release()
+        # Destroy all the windows
+        cv2.destroyAllWindows()
+        return (self.choices[np.argmax(prediction)])
 
 
 
-
-    def get_prediction(self, delay):
-
-
-        start = time.time()
-        current = time.time()
-
-        while current - start < delay:
-            print(round(abs(current-start-delay)))
-            current = time.time()
-            # ret, frame = cap.read()
-            # resized_frame = cv2.resize(frame, (224, 224), interpolation = cv2.INTER_AREA)
-            # image_np = np.array(resized_frame)
-            # normalized_image = (image_np.astype(np.float32) / 127.0) - 1 # Normalize the image
-            # data[0] = normalized_image
-            # cv2.imshow('frame', frame)
-
-        prediction = self.model.predict(data)
-        print(prediction)
-        print(self.choices[np.argmax(prediction)])
-        return self.choices[np.argmax(prediction)]
 
         
 
@@ -109,7 +107,7 @@ class rps:
     def play(self):
         while self.computer_wins <3 and self.user_wins <3:
             computer_choice = game.get_computer_choice()
-            user_choice = game.test()
+            user_choice = game.get_prediction()
 
 
             print(f"Computer choice : {computer_choice}   User choice : {user_choice}")
@@ -117,5 +115,6 @@ class rps:
             print (f"Scores : Computer - {self.computer_wins}    User - {self.user_wins}")
 
 game = rps()
-game.test()
+game.play()
+
 

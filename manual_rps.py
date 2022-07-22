@@ -31,7 +31,7 @@ class rps:
     '''
     Method to determine winner of game
     '''
-    def determine_winner(self, computer_choice, user_choice):
+    def get_winner(self, computer_choice, user_choice):
 
         if computer_choice == user_choice:
             return "Draw"
@@ -44,11 +44,13 @@ class rps:
         else:
             return "Computer won"
 
+    def play(self):
+        computer_choice = game.get_computer_choice()
+        user_choice = game.get_user_choice()
+
+        print(f"Computer choice : {computer_choice}   User choice : {user_choice}")
+        print (game.get_winner(computer_choice,user_choice))
 
 game = rps()
+game.play()
 
-computer_choice = game.get_computer_choice()
-user_choice = game.get_user_choice()
-
-print(f"Computer choice : {computer_choice}   User choice : {user_choice}")
-print (game.determine_winner(computer_choice,user_choice))
